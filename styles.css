@@ -41,7 +41,8 @@ label {
     font-weight: 500;
 }
 
-input {
+input[type="text"],
+input[type="number"] {
     padding: 10px;
     font-size: 1rem;
     border: 1px solid #ccc;
@@ -49,6 +50,14 @@ input {
     width: 80%;
     max-width: 400px;
     text-align: center;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+    outline: none;
 }
 
 button {
@@ -70,6 +79,7 @@ button:hover {
     margin-top: 30px;
 }
 
+/* Стили для календаря */
 #calendar {
     display: flex;
     flex-direction: column;
@@ -82,12 +92,14 @@ button:hover {
     padding: 15px;
     border-radius: 10px;
     background-color: #f9f9f9;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .month-section h3 {
     font-weight: bold;
     text-align: center;
     margin-bottom: 10px;
+    color: #4CAF50;
 }
 
 .days-grid {
@@ -101,31 +113,101 @@ button:hover {
     font-weight: bold;
     text-align: center;
     padding: 10px;
+    background-color: #eee;
+    border-radius: 5px;
+    color: #555;
 }
 
+/* Общие стили для дней */
 .calendar-day {
     padding: 10px;
-    background-color: #f9f9f9;
-    border-radius: 5px;
+    background-color: #fff;
+    border-radius: 10px;
     border: 1px solid #ddd;
     text-align: center;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
+.calendar-day:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Рабочие дни */
 .calendar-day.work {
-    background-color: #32CD32;
-    color: white;
-}
-
-.calendar-day.home {
     background-color: #1E90FF;
     color: white;
 }
 
-.calendar-day.home_work {
-    background-color: #FFD700;
-    color: black;
+/* Дни дома */
+.calendar-day.home {
+    background-color: #32CD32;
+    color: white;
 }
 
+/* Градиент для сменных дней (дом -> работа) */
+.calendar-day.home_work {
+    background: linear-gradient(135deg, #32CD32, #1E90FF);
+    color: white;
+    position: relative;
+}
+
+/* Градиент для сменных дней (работа -> дом) */
+.calendar-day.work_home {
+    background: linear-gradient(135deg, #1E90FF, #32CD32);
+    color: white;
+    position: relative;
+}
+
+/* Пустые дни */
 .calendar-day.empty {
     background-color: transparent;
+}
+
+/* Адаптивные стили */
+@media (max-width: 600px) {
+    .container {
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    button {
+        width: 100%;
+        font-size: 1rem;
+    }
+
+    .days-grid {
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+    }
+
+    .calendar-day,
+    .calendar-day-header {
+        padding: 5px;
+        font-size: 0.8rem;
+    }
+
+    .calendar-day-header {
+        font-weight: bold;
+        padding: 8px;
+    }
+
+    .calendar-day {
+        min-width: 35px;
+        min-height: 35px;
+    }
+}
+
+.calendar-icon {
+    font-size: 20px;
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    color: white;
 }

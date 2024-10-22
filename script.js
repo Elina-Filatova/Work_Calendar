@@ -1,6 +1,7 @@
+// Функция для генерации списка дней для заданного количества месяцев
 function getDaysListExact(startDateStr, numMonths) {
     let startDateParts = startDateStr.split(".");
-    let startDate = new Date(startDateParts[2], startDateParts[1] - 1, startDateParts[0]);
+    let startDate = new Date(startDateParts[2], startDateParts[1] - 1, startDateParts[0]); // Парсинг стартовой даты
     let daysList = [];
     let currentDate = new Date(startDate);
 
@@ -8,12 +9,11 @@ function getDaysListExact(startDateStr, numMonths) {
         let year = currentDate.getFullYear();
         let month = currentDate.getMonth();
 
-        // Reset to the first day of the current month
-        currentDate.setDate(1);
-        let daysInMonth = new Date(year, month + 1, 0).getDate();
+        let startDay = currentDate.getDate(); // Начало не с 1-го числа, а с выбранного дня
+        let daysInMonth = new Date(year, month + 1, 0).getDate(); // Количество дней в месяце
 
-        // Loop through each day of the month
-        for (let day = 1; day <= daysInMonth; day++) {
+        // Цикл по каждому дню месяца, начиная с выбранного дня
+        for (let day = startDay; day <= daysInMonth; day++) {
             daysList.push({
                 day: ("0" + day).slice(-2),
                 month: ("0" + (month + 1)).slice(-2),
@@ -22,12 +22,15 @@ function getDaysListExact(startDateStr, numMonths) {
             });
         }
 
-        // Move to the next month
+        // Переход к следующему месяцу, начиная с 1-го числа
+        currentDate.setDate(1);
         currentDate.setMonth(currentDate.getMonth() + 1);
     }
+
     return daysList;
 }
 
+// Функция для создания словаря расписания с шаблоном рабочих/домашних дней
 function getScheduleDictionary(daysToCalculate) {
     let distributionPattern = [
         ["home_work", 1],
@@ -58,41 +61,39 @@ function getScheduleDictionary(daysToCalculate) {
     return sf;
 }
 
+// Главная функция для расчета расписания
 function calculateSchedule(startWorkingDay, numMonths) {
     let daysToCalculate = getDaysListExact(startWorkingDay, numMonths);
     return getScheduleDictionary(daysToCalculate);
 }
 
-function createCalendar(schedule, numMonths) {
+// Функция для создания календаря
+function createCalendar(schedule, numMonths, startDate) {
     const calendar = document.getElementById('calendar');
-    calendar.innerHTML = ''; // Clear any previous calendar
+    calendar.innerHTML = ''; // Очистка предыдущего календаря
 
-    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+    const daysOfWeek = ['Пон', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вскр'];
 
-    const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    let currentDate = new Date(startDate);
 
-    let today = new Date();
     for (let i = 0; i < numMonths; i++) {
-        let currentMonth = today.getMonth() + i;
-        let year = today.getFullYear();
-        if (currentMonth > 11) {
-            currentMonth -= 12;
-            year += 1;
-        }
+        let year = currentDate.getFullYear();
+        let month = currentDate.getMonth();
 
-        // Create month section
+        // Создаем секцию месяца
         const monthContainer = document.createElement('div');
         monthContainer.classList.add('month-section');
 
         const monthHeader = document.createElement('h3');
-        monthHeader.textContent = monthNames[currentMonth] + " " + year;
+        monthHeader.textContent = monthNames[month] + " " + year;
         monthContainer.appendChild(monthHeader);
 
-        // Create a grid for days of the week
+        // Создаем сетку для дней недели
         const daysGrid = document.createElement('div');
         daysGrid.classList.add('days-grid');
 
-        // Add day headers (Sun, Mon, ...)
+        // Добавляем заголовки дней недели
         daysOfWeek.forEach(day => {
             const dayHeader = document.createElement('div');
             dayHeader.classList.add('calendar-day-header');
@@ -100,31 +101,40 @@ function createCalendar(schedule, numMonths) {
             daysGrid.appendChild(dayHeader);
         });
 
-        // Get the first day of the month
-        const firstDayOfMonth = new Date(year, currentMonth, 1).getDay();
-        const daysInMonth = new Date(year, currentMonth + 1, 0).getDate();
+        // Получаем первый день месяца и количество дней в месяце
+        let firstDayOfMonth = new Date(year, month, currentDate.getDate()).getDay();
+        firstDayOfMonth = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1; // Сдвиг на понедельник
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-        // Fill in empty days before the first day of the month
+        // Заполняем пустые дни перед первым днем месяца
         for (let j = 0; j < firstDayOfMonth; j++) {
             const emptyDay = document.createElement('div');
             emptyDay.classList.add('calendar-day', 'empty');
             daysGrid.appendChild(emptyDay);
         }
 
-        // Fill in the days of the month
-        for (let day = 1; day <= daysInMonth; day++) {
+        // Заполняем дни месяца
+        for (let day = currentDate.getDate(); day <= daysInMonth; day++) {
             const dayElement = document.createElement('div');
             dayElement.classList.add('calendar-day');
 
-            const dayStr = ("0" + day).slice(-2) + "." + ("0" + (currentMonth + 1)).slice(-2) + "." + year;
+            const dayStr = ("0" + day).slice(-2) + "." + ("0" + (month + 1)).slice(-2) + "." + year;
 
-            // Check if the day is in the schedule and apply the corresponding class
+            // Добавляем иконки и классы для каждого дня
             if (schedule.work.includes(dayStr)) {
                 dayElement.classList.add('work');
             } else if (schedule.home.includes(dayStr)) {
                 dayElement.classList.add('home');
-            } else if (schedule.home_work.includes(dayStr) || schedule.work_home.includes(dayStr)) {
+            } else if (schedule.home_work.includes(dayStr)) {
                 dayElement.classList.add('home_work');
+                const trainIcon = document.createElement('i');
+                trainIcon.classList.add('fas', 'fa-train', 'calendar-icon'); // Добавляем иконку поезда
+                dayElement.appendChild(trainIcon);
+            } else if (schedule.work_home.includes(dayStr)) {
+                dayElement.classList.add('work_home');
+                const homeIcon = document.createElement('i');
+                homeIcon.classList.add('fas', 'fa-home', 'calendar-icon'); // Добавляем иконку дома
+                dayElement.appendChild(homeIcon);
             }
 
             dayElement.textContent = day;
@@ -133,18 +143,26 @@ function createCalendar(schedule, numMonths) {
 
         monthContainer.appendChild(daysGrid);
         calendar.appendChild(monthContainer);
+
+        // Переход к следующему месяцу
+        currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1); // Перейти к следующему месяцу
     }
 }
 
+// Обработчик события для генерации календаря
 document.getElementById('generateBtn').addEventListener('click', function () {
     let startDate = document.getElementById('startDate').value;
     let numMonths = parseInt(document.getElementById('numMonths').value);
 
     if (!startDate || isNaN(numMonths) || numMonths <= 0) {
-        alert('Please enter valid inputs');
+        alert('Пожалуйста, введите корректные данные');
         return;
     }
 
-    let schedule = calculateSchedule(startDate, numMonths);
-    createCalendar(schedule, numMonths);
+    // Дата уже в формате d.m.Y, используем её как есть
+    let formattedStartDate = startDate;
+
+    // Вычисляем расписание
+    let schedule = calculateSchedule(formattedStartDate, numMonths);
+    createCalendar(schedule, numMonths, new Date(startDate.split('.').reverse().join('-'))); // Создаем дату в формате ГГГГ-ММ-ДД
 });
