@@ -100,6 +100,7 @@ button:hover {
     text-align: center;
     margin-bottom: 10px;
     color: #4CAF50;
+    /* Зеленый заголовок месяца */
 }
 
 .days-grid {
@@ -153,11 +154,38 @@ button:hover {
     position: relative;
 }
 
+/* Иконка паровоза для дня перехода дом -> работа */
+.calendar-day.home_work::after {
+    content: "\f238";
+    /* Font Awesome код для иконки паровоза */
+    font-family: "Font Awesome 5 Free";
+    /* Задаем семейство шрифтов */
+    font-weight: 900;
+    font-size: 20px;
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    color: white;
+}
+
 /* Градиент для сменных дней (работа -> дом) */
 .calendar-day.work_home {
     background: linear-gradient(135deg, #1E90FF, #32CD32);
     color: white;
     position: relative;
+}
+
+/* Иконка дома для дня перехода работа -> дом */
+.calendar-day.work_home::after {
+    content: "\f015";
+    /* Font Awesome код для иконки дома */
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    font-size: 20px;
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    color: white;
 }
 
 /* Пустые дни */
@@ -204,6 +232,20 @@ button:hover {
     }
 }
 
+.calendar-day.home_work {
+    background: linear-gradient(135deg, #32CD32, #1E90FF);
+    color: white;
+    position: relative;
+}
+
+/* Градиент для сменных дней (работа -> дом) */
+.calendar-day.work_home {
+    background: linear-gradient(135deg, #1E90FF, #32CD32);
+    color: white;
+    position: relative;
+}
+
+/* Стили для иконок */
 .calendar-icon {
     font-size: 20px;
     position: absolute;
